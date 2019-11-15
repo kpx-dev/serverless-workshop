@@ -30,7 +30,8 @@
       
       <guid>/serverless/sam/</guid>
       <description>Create the S3 repo to store SAM artifact Since the S3 repo name must be unique globally, please postfix with your username
-aws s3api create-bucket --bucket serverless-lab-[your-username]  Upgrade SAM CLI to latest version sudo pip install --upgrade aws-sam-cli  Package the template Don&amp;rsquo;t forget to replace serverless-lab-[your-username] with your actual S3 bucket name.
+aws s3api create-bucket --bucket serverless-lab-[your-username]  Upgrade SAM CLI to latest version Run the command below and press ENTER to continue
+./install-sam.sh  Package the template Don&amp;rsquo;t forget to replace serverless-lab-[your-username] with your actual S3 bucket name.
 sam package --s3-bucket serverless-lab-[your-username] --s3-prefix lab --output-template-file template_packaged.yaml  Deploy Lambda using SAM This will take 1-2 minutes as SAM is creating CloudFormation stack.</description>
     </item>
     

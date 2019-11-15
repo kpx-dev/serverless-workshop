@@ -12,8 +12,9 @@ aws s3api create-bucket --bucket serverless-lab-[your-username]
 ```
 
 #### Upgrade SAM CLI to latest version
+Run the command below and press **ENTER** to continue
 ```
-sudo pip install --upgrade aws-sam-cli
+./install-sam.sh
 ```
 
 #### Package the template
