@@ -1,0 +1,386 @@
+[
+{
+	"uri": "/",
+	"title": "Amazon Chatbot Workshop",
+	"tags": [],
+	"description": "",
+	"content": "Amazon Chatbot Workshop In this workshop, we will explore how to setup AWS Chatbot to work with Slack.\n"
+},
+{
+	"uri": "/conclusion/conclusion/",
+	"title": "What Have We Accomplished",
+	"tags": [],
+	"description": "",
+	"content": "We have:\n Deployed an application consisting of microservices Deployed the Kubernetes Dashboard Deployed packages using Helm Deployed a centralized logging infrastructure Configured Automatic scaling of our pods and worker nodes  "
+},
+{
+	"uri": "/deploy/applications/",
+	"title": "Deploy our Sample Applications",
+	"tags": [],
+	"description": "",
+	"content": "apiVersion: apps/v1 kind: Deployment metadata: name: ecsdemo-nodejs labels: app: ecsdemo-nodejs namespace: default spec: replicas: 1 selector: matchLabels: app: ecsdemo-nodejs strategy: rollingUpdate: maxSurge: 25% maxUnavailable: 25% type: RollingUpdate template: metadata: labels: app: ecsdemo-nodejs spec: containers: - image: brentley/ecsdemo-nodejs:latest imagePullPolicy: Always name: ecsdemo-nodejs ports: - containerPort: 3000 protocol: TCP  In the sample file above, we describe the service and how it should be deployed. We will write this description to the kubernetes api using kubectl, and kubernetes will ensure our preferences are met as the application is deployed.\nThe containers listen on port 3000, and native service discovery will be used to locate the running containers and communicate with them.\n"
+},
+{
+	"uri": "/deploy/deploynodejs/",
+	"title": "Deploy NodeJS Backend API",
+	"tags": [],
+	"description": "",
+	"content": "Let’s bring up the NodeJS Backend API!\nCopy/Paste the following commands into your Cloud9 workspace:\ncd ~/environment/ecsdemo-nodejs kubectl apply -f kubernetes/deployment.yaml kubectl apply -f kubernetes/service.yaml  We can watch the progress by looking at the deployment status:\nkubectl get deployment ecsdemo-nodejs  "
+},
+{
+	"uri": "/eksctl/prerequisites/",
+	"title": "Prerequisites",
+	"tags": [],
+	"description": "",
+	"content": "For this module, we need to download the eksctl binary:\ncurl --silent --location \u0026quot;https://github.com/weaveworks/eksctl/releases/download/latest_release/eksctl_$(uname -s)_amd64.tar.gz\u0026quot; | tar xz -C /tmp sudo mv -v /tmp/eksctl /usr/local/bin  Confirm the eksctl command works:\neksctl version  "
+},
+{
+	"uri": "/dashboard/dashboard/",
+	"title": "Deploy the Official Kubernetes Dashboard",
+	"tags": [],
+	"description": "",
+	"content": "The official Kubernetes dashboard is not deployed by default, but there are instructions in the official documentation\nWe can deploy the dashboard with the following command:\nkubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v1.10.1/src/deploy/recommended/kubernetes-dashboard.yaml  Since this is deployed to our private cluster, we need to access it via a proxy. Kube-proxy is available to proxy our requests to the dashboard service. In your workspace, run the following command:\nkubectl proxy --port=8080 --address='0.0.0.0' --disable-filter=true \u0026amp;  This will start the proxy, listen on port 8080, listen on all interfaces, and will disable the filtering of non-localhost requests.\nThis command will continue to run in the background of the current terminal\u0026rsquo;s session.\nWe are disabling request filtering, a security feature that guards against XSRF attacks. This isn\u0026rsquo;t recommended for a production environment, but is useful for our dev environment.\n "
+},
+{
+	"uri": "/codepipeline/role/",
+	"title": "Create IAM Role",
+	"tags": [],
+	"description": "",
+	"content": "In an AWS CodePipeline, we are going to use AWS CodeBuild to deploy a sample Kubernetes service. This requires an AWS Identity and Access Management (IAM) role capable of interacting with the EKS cluster.\nIn this step, we are going to create an IAM role and add an inline policy that we will use in the CodeBuild stage to interact with the EKS cluster via kubectl.\nCreate the role:\ncd ~/environment TRUST=\u0026quot;{ \\\u0026quot;Version\\\u0026quot;: \\\u0026quot;2012-10-17\\\u0026quot;, \\\u0026quot;Statement\\\u0026quot;: [ { \\\u0026quot;Effect\\\u0026quot;: \\\u0026quot;Allow\\\u0026quot;, \\\u0026quot;Principal\\\u0026quot;: { \\\u0026quot;AWS\\\u0026quot;: \\\u0026quot;arn:aws:iam::${ACCOUNT_ID}:root\\\u0026quot; }, \\\u0026quot;Action\\\u0026quot;: \\\u0026quot;sts:AssumeRole\\\u0026quot; } ] }\u0026quot; echo '{ \u0026quot;Version\u0026quot;: \u0026quot;2012-10-17\u0026quot;, \u0026quot;Statement\u0026quot;: [ { \u0026quot;Effect\u0026quot;: \u0026quot;Allow\u0026quot;, \u0026quot;Action\u0026quot;: \u0026quot;eks:Describe*\u0026quot;, \u0026quot;Resource\u0026quot;: \u0026quot;*\u0026quot; } ] }' \u0026gt; /tmp/iam-role-policy aws iam create-role --role-name EksWorkshopCodeBuildKubectlRole --assume-role-policy-document \u0026quot;$TRUST\u0026quot; --output text --query 'Role.Arn' aws iam put-role-policy --role-name EksWorkshopCodeBuildKubectlRole --policy-name eks-describe --policy-document file:///tmp/iam-role-policy  "
+},
+{
+	"uri": "/prerequisites/",
+	"title": "Start the workshop...",
+	"tags": [],
+	"description": "",
+	"content": " Getting Started Continue with Create a Workspace\n"
+},
+{
+	"uri": "/codepipeline/configmap/",
+	"title": "Modify aws-auth ConfigMap",
+	"tags": [],
+	"description": "",
+	"content": "Now that we have the IAM role created, we are going to add the role to the aws-auth ConfigMap for the EKS cluster.\nOnce the ConfigMap includes this new role, kubectl in the CodeBuild stage of the pipeline will be able to interact with the EKS cluster via the IAM role.\nROLE=\u0026quot; - rolearn: arn:aws:iam::$ACCOUNT_ID:role/EksWorkshopCodeBuildKubectlRole\\n username: build\\n groups:\\n - system:masters\u0026quot; kubectl get -n kube-system configmap/aws-auth -o yaml | awk \u0026quot;/mapRoles: \\|/{print;print \\\u0026quot;$ROLE\\\u0026quot;;next}1\u0026quot; \u0026gt; /tmp/aws-auth-patch.yml kubectl patch configmap/aws-auth -n kube-system --patch \u0026quot;$(cat /tmp/aws-auth-patch.yml)\u0026quot;  If you would like to edit the aws-auth ConfigMap manually, you can run: $ kubectl edit -n kube-system configmap/aws-auth\n "
+},
+{
+	"uri": "/codepipeline/forksample/",
+	"title": "Fork Sample Repository",
+	"tags": [],
+	"description": "",
+	"content": "We are now going to fork the sample Kubernetes service so that we will be able modify the repository and trigger builds.\nLogin to GitHub and fork the sample service to your own account:\nhttps://github.com/rnzsgh/eks-workshop-sample-api-service-go\nOnce the repo is forked, you can view it in your your GitHub repositories.\nThe forked repo will look like:\n"
+},
+{
+	"uri": "/codepipeline/githubcredentials/",
+	"title": "GitHub Access Token",
+	"tags": [],
+	"description": "",
+	"content": "In order for CodePipeline to receive callbacks from GitHub, we need to generate a personal access token.\nOnce created, an access token can be stored in a secure enclave and reused, so this step is only required during the first run or when you need to generate new keys.\nOpen up the New personal access page in GitHub.\nYou may be prompted to enter your GitHub password\n Enter a value for Token description, check the repo permission scope and scroll down and click the Generate token button\nCopy the personal access token and save it in a secure place for the next step\n"
+},
+{
+	"uri": "/codepipeline/codepipeline/",
+	"title": "CodePipeline Setup",
+	"tags": [],
+	"description": "",
+	"content": " Now we are going to create the AWS CodePipeline using AWS CloudFormation.\nCloudFormation is an infrastructure as code (IaC) tool which provides a common language for you to describe and provision all the infrastructure resources in your cloud environment. CloudFormation allows you to use a simple text file to model and provision, in an automated and secure manner, all the resources needed for your applications across all regions and accounts.\nEach EKS deployment/service should have its own CodePipeline and be located in an isolated source repository.\nYou can modify the CloudFormation templates provided with this workshop to meet your system requirements to easily onboard new services to your EKS cluster. For each new service the following steps can be repeated.\nClick the Launch button to create the CloudFormation stack in the AWS Management Console.\n   Launch template       CodePipeline \u0026amp; EKS  Launch    Download      After the console is open, enter your GitHub username, personal access token (created in previous step), check the acknowledge box and then click the \u0026ldquo;Create stack\u0026rdquo; button located at the bottom of the page.\nWait for the status to change from \u0026ldquo;CREATE_IN_PROGRESS\u0026rdquo; to CREATE_COMPLETE before moving on to the next step.\nOpen CodePipeline in the Management Console. You will see a CodePipeline that starts with eks-workshop-codepipeline. Click this link to view the details.\nIf you receive a permissions error similar to User x is not authorized to perform: codepipeline:ListPipelines\u0026hellip; upon clicking the above link, the CodePipeline console may have opened up in the wrong region. To correct this, from the Region dropdown in the console, choose the region you provisioned the workshop in. Select Oregon (us-west-2) if you provisioned the workshow per the \u0026ldquo;Start the workshop at an AWS event\u0026rdquo; instructions.\n Once you are on the detail page for the specific CodePipeline, you can see the status along with links to the change and build details.\nIf you click on the \u0026ldquo;details\u0026rdquo; link in the build/deploy stage, you can see the output from the CodeBuild process.\n To review the status of the deployment, you can run:\nkubectl describe deployment hello-k8s  For the status of the service, run the following command:\nkubectl describe service hello-k8s  Challenge: How can we view our exposed service?\nHINT: Which kubectl command will get you the Elastic Load Balancer (ELB) endpoint for this app?\n  Expand here to see the solution   Once the service is built and delivered, we can run the following command to get the Elastic Load Balancer (ELB) endpoint and open it in a browser. If the message is not updated immediately, give Kubernetes some time to deploy the change.\n kubectl get services hello-k8s -o wide  This service was configured with a LoadBalancer so, an AWS Elastic Load Balancer is launched by Kubernetes for the service. The EXTERNAL-IP column contains a value that ends with \u0026ldquo;elb.amazonaws.com\u0026rdquo; - the full value is the DNS address.\n   "
+},
+{
+	"uri": "/prerequisites/workspace/",
+	"title": "Create a Workspace",
+	"tags": [],
+	"description": "",
+	"content": " The Cloud9 workspace should be built by an IAM user with Administrator privileges, not the root account user. Please ensure you are logged in as an IAM user, not the root account user.\n This workshop was designed to run in the Oregon (us-west-2) region. Please don\u0026rsquo;t run in any other region. Future versions of this workshop will expand region availability, and this message will be removed.\n -- Ad blockers, javascript disablers, and tracking blockers should be disabled for the cloud9 domain, or connecting to the workspace might be impacted. Cloud9 requires third-party-cookies. You can whitelist the specific domains.\n Launch Cloud9 in your closest region:  Oregon Ireland Ohio Singapore  Create a Cloud9 Environment: https://us-west-2.console.aws.amazon.com/cloud9/home?region=us-west-2\n Create a Cloud9 Environment: https://eu-west-1.console.aws.amazon.com/cloud9/home?region=eu-west-1\n Create a Cloud9 Environment: https://us-east-2.console.aws.amazon.com/cloud9/home?region=us-east-2\n Create a Cloud9 Environment: https://ap-southeast-1.console.aws.amazon.com/cloud9/home?region=ap-southeast-1\n  $(function(){$(\"#region\").tabs();});  Select Create environment Name it eksworkshop, and take all other defaults When it comes up, customize the environment by closing the welcome tab and lower work area, and opening a new terminal tab in the main work area:  Your workspace should now look like this:  If you like this theme, you can choose it yourself by selecting View / Themes / Solarized / Solarized Dark in the Cloud9 workspace menu.\n  "
+},
+{
+	"uri": "/prerequisites/k8stools/",
+	"title": "Install Kubernetes Tools",
+	"tags": [],
+	"description": "",
+	"content": " Amazon EKS clusters require kubectl and kubelet binaries and the aws-cli or aws-iam-authenticator binary to allow IAM authentication for your Kubernetes cluster.\nIn this workshop we will give you the commands to download the Linux binaries. If you are running Mac OSX / Windows, please see the official EKS docs for the download links.\n Install kubectl sudo curl --silent --location -o /usr/local/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/v1.13.7/bin/linux/amd64/kubectl sudo chmod +x /usr/local/bin/kubectl  Install JQ and envsubst sudo yum -y install jq gettext  Verify the binaries are in the path and executable for command in kubectl jq envsubst do which $command \u0026amp;\u0026gt;/dev/null \u0026amp;\u0026amp; echo \u0026quot;$command in path\u0026quot; || echo \u0026quot;$command NOT FOUND\u0026quot; done  "
+},
+{
+	"uri": "/codepipeline/change/",
+	"title": "Trigger New Release",
+	"tags": [],
+	"description": "",
+	"content": " Update Our Application So far we have walked through setting up CI/CD for EKS using AWS CodePipeline and now we are going to make a change to the GitHub repository so that we can see a new release built and delivered.\nOpen GitHub and select the forked repository with the name eks-workshop-sample-api-service-go.\nClick on main.go file and then click on the edit button, which looks like a pencil.\nChange the text where it says \u0026ldquo;Hello World\u0026rdquo;, add a commit message and then click the \u0026ldquo;Commit changes\u0026rdquo; button.\nYou should leave the master branch selected.\nThe main.go application needs to be compiled, so please ensure that you don\u0026rsquo;t accidentally break the build :)\n After you modify and commit your change in GitHub, in approximately one minute you will see a new build triggered in the AWS Management Console Confirm the Change If you still have the ELB URL open in your browser, refresh to confirm the update. If you need to retrieve the URL again, use kubectl get services hello-k8s -o wide\n"
+},
+{
+	"uri": "/codepipeline/cleanup/",
+	"title": "Cleanup",
+	"tags": [],
+	"description": "",
+	"content": "Congratulations on completing the CI/CD with CodePipeline module.\nThis module is not used in subsequent steps, so you can remove the resources now, or at the end of the workshop.\nFirst we need to delete the Kubernetes deployment and service:\nkubectl delete deployments hello-k8s kubectl delete services hello-k8s  Next, we are going to delete the CloudFormation stack created. Open CloudFormation the AWS Management Console.\nCheck the box next to the eksws-codepipeline stack, select the Actions dropdown menu and then click Delete stack:\nNow we are going to delete the ECR repository:\nEmpty and then delete the S3 bucket used by CodeBuild for build artifacts (bucket name starts with eksws-codepipeline). First, select the bucket, then empty the bucket and finally delete the bucket:\n"
+},
+{
+	"uri": "/prerequisites/iamrole/",
+	"title": "Create an IAM role for your Workspace",
+	"tags": [],
+	"description": "",
+	"content": " Follow this deep link to create an IAM role with Administrator access. Confirm that AWS service and EC2 are selected, then click Next to view permissions. Confirm that AdministratorAccess is checked, then click Next: Tags to assign tags. Take the defaults, and click Next: Review to review. Enter eksworkshop-admin-yourusername for the Name, and click Create role.   "
+},
+{
+	"uri": "/prerequisites/ec2instance/",
+	"title": "Attach the IAM role to your Workspace",
+	"tags": [],
+	"description": "",
+	"content": " Follow this deep link to find your Cloud9 EC2 instance Select the instance, then choose Actions / Instance Settings / Attach/Replace IAM Role  Choose eksworkshop-admin-yourusername from the IAM Role drop down, and select Apply   "
+},
+{
+	"uri": "/prerequisites/workspaceiam/",
+	"title": "Update IAM settings for your Workspace",
+	"tags": [],
+	"description": "",
+	"content": " Cloud9 normally manages IAM credentials dynamically. This isn\u0026rsquo;t currently compatible with the EKS IAM authentication, so we will disable it and rely on the IAM role instead.\n  Return to your workspace and click the sprocket, or launch a new tab to open the Preferences tab Select AWS SETTINGS Turn off AWS managed temporary credentials Close the Preferences tab   To ensure temporary credentials aren\u0026rsquo;t already in place we will also remove any existing credentials file:\nrm -vf ${HOME}/.aws/credentials  We should configure our aws cli with our current region as default:\nexport ACCOUNT_ID=$(aws sts get-caller-identity --output text --query Account) export AWS_REGION=$(curl -s 169.254.169.254/latest/dynamic/instance-identity/document | jq -r '.region') echo \u0026quot;export ACCOUNT_ID=${ACCOUNT_ID}\u0026quot; \u0026gt;\u0026gt; ~/.bash_profile echo \u0026quot;export AWS_REGION=${AWS_REGION}\u0026quot; \u0026gt;\u0026gt; ~/.bash_profile aws configure set default.region ${AWS_REGION} aws configure get default.region  Validate the IAM role Use the GetCallerIdentity CLI command to validate that the Cloud9 IDE is using the correct IAM role.\naws sts get-caller-identity  The output assumed-role name should contain:\neksworkshop-admin-yourusername  VALID If the Arn contains the role name from above and an Instance ID, you may proceed.\n{ \u0026quot;Account\u0026quot;: \u0026quot;123456789012\u0026quot;, \u0026quot;UserId\u0026quot;: \u0026quot;AROA1SAMPLEAWSIAMROLE:i-01234567890abcdef\u0026quot;, \u0026quot;Arn\u0026quot;: \u0026quot;arn:aws:sts::123456789012:assumed-role/eksworkshop-admin-yourusername/i-01234567890abcdef\u0026quot; }  INVALID If the _Arn contains TeamRole, MasterRole, or does not match the role name output above, DO NOT PROCEED. Go back and confirm the steps on this page.\n{ \u0026quot;Account\u0026quot;: \u0026quot;123456789012\u0026quot;, \u0026quot;UserId\u0026quot;: \u0026quot;AROA1SAMPLEAWSIAMROLE:i-01234567890abcdef\u0026quot;, \u0026quot;Arn\u0026quot;: \u0026quot;arn:aws:sts::123456789012:assumed-role/TeamRole/MasterRole\u0026quot; }  "
+},
+{
+	"uri": "/deploy/deploycrystal/",
+	"title": "Deploy Crystal Backend API",
+	"tags": [],
+	"description": "",
+	"content": "Let’s bring up the Crystal Backend API!\nCopy/Paste the following commands into your Cloud9 workspace:\ncd ~/environment/ecsdemo-crystal kubectl apply -f kubernetes/deployment.yaml kubectl apply -f kubernetes/service.yaml  We can watch the progress by looking at the deployment status:\nkubectl get deployment ecsdemo-crystal  "
+},
+{
+	"uri": "/cleanup/undeploy/",
+	"title": "Undeploy the applications",
+	"tags": [],
+	"description": "",
+	"content": "To delete the resources created by the applications, we should delete the application deployments and kubernetes dashboard.\nNote that if you followed the cleanup section of the modules, some of the commands below might fail because there is nothing to delete and its ok.\nUndeploy the applications:\ncd ~/environment/ecsdemo-frontend kubectl delete -f kubernetes/service.yaml kubectl delete -f kubernetes/deployment.yaml cd ~/environment/ecsdemo-crystal kubectl delete -f kubernetes/service.yaml kubectl delete -f kubernetes/deployment.yaml cd ~/environment/ecsdemo-nodejs kubectl delete -f kubernetes/service.yaml kubectl delete -f kubernetes/deployment.yaml kubectl delete -f https://raw.githubusercontent.com/kubernetes/dashboard/v1.10.1/src/deploy/recommended/kubernetes-dashboard.yaml  "
+},
+{
+	"uri": "/eksctl/launcheks/",
+	"title": "Launch EKS",
+	"tags": [],
+	"description": "",
+	"content": " DO NOT PROCEED with this step unless you have validated the IAM role in use by the Cloud9 IDE. You will not be able to run the necessary kubectl commands in the later modules unless the EKS cluster is built using the IAM role.\n Challenge: How do I check the IAM role on the workspace?\n  Expand here to see the solution   Run aws sts get-caller-identity and validate that your Arn contains eksworkshop-admin-yourusername or TeamRole (or the role created when starting the workshop) and an Instance Id.\n{ \u0026quot;Account\u0026quot;: \u0026quot;123456789012\u0026quot;, \u0026quot;UserId\u0026quot;: \u0026quot;AROA1SAMPLEAWSIAMROLE:i-01234567890abcdef\u0026quot;, \u0026quot;Arn\u0026quot;: \u0026quot;arn:aws:sts::123456789012:assumed-role/eksworkshop-admin-yourusername/i-01234567890abcdef\u0026quot; } or { \u0026quot;Account\u0026quot;: \u0026quot;123456789012\u0026quot;, \u0026quot;UserId\u0026quot;: \u0026quot;AROA1SAMPLEAWSIAMROLE:i-01234567890abcdef\u0026quot;, \u0026quot;Arn\u0026quot;: \u0026quot;arn:aws:sts::123456789012:assumed-role/TeamRole/i-01234567890abcdef\u0026quot; }  If you do not see the correct role, please go back and validate the IAM role for troubleshooting.\nIf you do see the correct role, proceed to next step to create an EKS cluster.\n  Create an EKS cluster eksctl create cluster --name=eksworkshop-eksctl-yourusername --nodes=3 --alb-ingress-access --region=${AWS_REGION}  Launching EKS and all the dependencies will take approximately 15 minutes\n "
+},
+{
+	"uri": "/eksctl/",
+	"title": "Launch using eksctl",
+	"tags": [],
+	"description": "",
+	"content": " Launch using eksctl eksctl is a tool jointly developed by AWS and Weaveworks that automates much of the experience of creating EKS clusters.\nIn this module, we will use eksctl to launch and configure our EKS cluster and nodes.\n  "
+},
+{
+	"uri": "/prerequisites/clone/",
+	"title": "Clone the Service Repos",
+	"tags": [],
+	"description": "",
+	"content": "cd ~/environment git clone https://github.com/brentley/ecsdemo-frontend.git git clone https://github.com/brentley/ecsdemo-nodejs.git git clone https://github.com/brentley/ecsdemo-crystal.git  "
+},
+{
+	"uri": "/deploy/servicetype/",
+	"title": "Let&#39;s check Service Types",
+	"tags": [],
+	"description": "",
+	"content": "Before we bring up the frontend service, let\u0026rsquo;s take a look at the service types we are using: This is kubernetes/service.yaml for our frontend service:\napiVersion: v1 kind: Service metadata: name: ecsdemo-frontend spec: selector: app: ecsdemo-frontend type: LoadBalancer ports: - protocol: TCP port: 80 targetPort: 3000  Notice type: LoadBalancer: This will configure an ELB to handle incoming traffic to this service.\nCompare this to kubernetes/service.yaml for one of our backend services:\napiVersion: v1 kind: Service metadata: name: ecsdemo-nodejs spec: selector: app: ecsdemo-nodejs ports: - protocol: TCP port: 80 targetPort: 3000  Notice there is no specific service type described. When we check the kubernetes documentation we find that the default type is ClusterIP. This Exposes the service on a cluster-internal IP. Choosing this value makes the service only reachable from within the cluster.\n"
+},
+{
+	"uri": "/deploy/servicerole/",
+	"title": "Ensure the ELB Service Role exists",
+	"tags": [],
+	"description": "",
+	"content": "In AWS accounts that have never created a load balancer before, it\u0026rsquo;s possible that the service role for ELB might not exist yet.\nWe can check for the role, and create it if it\u0026rsquo;s missing.\nCopy/Paste the following commands into your Cloud9 workspace:\naws iam get-role --role-name \u0026quot;AWSServiceRoleForElasticLoadBalancing\u0026quot; || aws iam create-service-linked-role --aws-service-name \u0026quot;elasticloadbalancing.amazonaws.com\u0026quot;  "
+},
+{
+	"uri": "/deploy/deployfrontend/",
+	"title": "Deploy Frontend Service",
+	"tags": [],
+	"description": "",
+	"content": "Let’s bring up the Ruby Frontend!\nCopy/Paste the following commands into your Cloud9 workspace:\ncd ~/environment/ecsdemo-frontend kubectl apply -f kubernetes/deployment.yaml kubectl apply -f kubernetes/service.yaml  We can watch the progress by looking at the deployment status:\nkubectl get deployment ecsdemo-frontend  "
+},
+{
+	"uri": "/cleanup/eksctl/",
+	"title": "Delete the EKSCTL Cluster",
+	"tags": [],
+	"description": "",
+	"content": "In order to delete the resources created for this EKS cluster, run the following commands:\nDelete the cluster:\neksctl delete cluster --name=eksworkshop-eksctl-yourusername  The nodegroup will have to complete the deletion process before the EKS cluster can be deleted. The total process will take approximately 15 minutes, and can be monitored via the CloudFormation Console\n "
+},
+{
+	"uri": "/eksctl/test/",
+	"title": "Test the Cluster",
+	"tags": [],
+	"description": "",
+	"content": " Test the cluster: Confirm your Nodes:\nkubectl get nodes # if we see our 3 nodes, we know we have authenticated correctly  Export the Worker Role Name for use throughout the workshop\nSTACK_NAME=$(eksctl get nodegroup --cluster eksworkshop-eksctl-yourusername -o json | jq -r '.[].StackName') INSTANCE_PROFILE_ARN=$(aws cloudformation describe-stacks --stack-name $STACK_NAME | jq -r '.Stacks[].Outputs[] | select(.OutputKey==\u0026quot;InstanceProfileARN\u0026quot;) | .OutputValue') ROLE_NAME=$(aws cloudformation describe-stacks --stack-name $STACK_NAME | jq -r '.Stacks[].Outputs[] | select(.OutputKey==\u0026quot;InstanceRoleARN\u0026quot;) | .OutputValue' | cut -f2 -d/) echo \u0026quot;export ROLE_NAME=${ROLE_NAME}\u0026quot; \u0026gt;\u0026gt; ~/.bash_profile echo \u0026quot;export INSTANCE_PROFILE_ARN=${INSTANCE_PROFILE_ARN}\u0026quot; \u0026gt;\u0026gt; ~/.bash_profile  Congratulations! You now have a fully working Amazon EKS Cluster that is ready to use!\n"
+},
+{
+	"uri": "/dashboard/connect/",
+	"title": "Access the Dashboard",
+	"tags": [],
+	"description": "",
+	"content": "Now we can access the Kubernetes Dashboard\n In your Cloud9 environment, click Tools / Preview / Preview Running Application Scroll to the end of the URL and append:  /api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/  Open a New Terminal Tab and enter\naws eks get-token --cluster-name eksworkshop-eksctl-yourusername | jq -r '.status.token'  Copy the output of this command and then click the radio button next to Token then in the text field below paste the output from the last command.\nThen press Sign In.\nIf you want to see the dashboard in a full tab, click the Pop Out button, like below: "
+},
+{
+	"uri": "/dashboard/",
+	"title": "Deploy the Kubernetes Dashboard",
+	"tags": [],
+	"description": "",
+	"content": " Deploy the Kubernetes Dashboard In this Chapter, we will deploy the official Kubernetes dashboard, and connect through our Cloud9 Workspace.\n"
+},
+{
+	"uri": "/prerequisites/sshkey/",
+	"title": "Create an SSH key",
+	"tags": [],
+	"description": "",
+	"content": " Starting from here, when you see command to be entered such as below, you will enter these commands into Cloud9 IDE. You can use the Copy to clipboard feature (right hand upper corner) to simply copy and paste into Cloud9. In order to paste, you can use Ctrl + V for Windows or Command + V for Mac.\n Please run this command to generate SSH Key in Cloud9. This key will be used on the worker node instances to allow ssh access if necessary.\nssh-keygen  Press enter 3 times to take the default choices\n Upload the public key to your EC2 region:\naws ec2 import-key-pair --key-name \u0026quot;eksworkshop-yourusername\u0026quot; --public-key-material file://~/.ssh/id_rsa.pub  "
+},
+{
+	"uri": "/deploy/",
+	"title": "Deploy the Example Microservices",
+	"tags": [],
+	"description": "",
+	"content": " Deploy the Example Microservices  Deploy our Sample Applications   Deploy NodeJS Backend API   Deploy Crystal Backend API   Let\u0026#39;s check Service Types   Ensure the ELB Service Role exists   Deploy Frontend Service   Find the Service Address   Scale the Backend Services   Scale the Frontend   Cleanup the applications   "
+},
+{
+	"uri": "/deploy/viewservices/",
+	"title": "Find the Service Address",
+	"tags": [],
+	"description": "",
+	"content": "Now that we have a running service that is type: LoadBalancer we need to find the ELB\u0026rsquo;s address. We can do this by using the get services operation of kubectl:\nkubectl get service ecsdemo-frontend  Notice the field isn\u0026rsquo;t wide enough to show the FQDN of the ELB. We can adjust the output format with this command:\nkubectl get service ecsdemo-frontend -o wide  If we wanted to use the data programatically, we can also output via json. This is an example of how we might be able to make use of json output:\nELB=$(kubectl get service ecsdemo-frontend -o json | jq -r '.status.loadBalancer.ingress[].hostname') curl -m3 -v $ELB  It will take several minutes for the ELB to become healthy and start passing traffic to the frontend pods.\n You should also be able to copy/paste the loadBalancer hostname into your browser and see the application running. Keep this tab open while we scale the services up on the next page.\n"
+},
+{
+	"uri": "/codepipeline/",
+	"title": "CI/CD with CodePipeline",
+	"tags": [],
+	"description": "",
+	"content": " CI/CD with CodePipeline Continuous integration (CI) and continuous delivery (CD) are essential for deft organizations. Teams are more productive when they can make discrete changes frequently, release those changes programmatically and deliver updates without disruption.\nIn this module, we will build a CI/CD pipeline using AWS CodePipeline. The CI/CD pipeline will deploy a sample Kubernetes service, we will make a change to the GitHub repository and observe the automated delivery of this change to the cluster.\n"
+},
+{
+	"uri": "/deploy/scalebackend/",
+	"title": "Scale the Backend Services",
+	"tags": [],
+	"description": "",
+	"content": "When we launched our services, we only launched one container of each. We can confirm this by viewing the running pods:\nkubectl get deployments  Now let\u0026rsquo;s scale up the backend services:\nkubectl scale deployment ecsdemo-nodejs --replicas=3 kubectl scale deployment ecsdemo-crystal --replicas=3  Confirm by looking at deployments again:\nkubectl get deployments  Also, check the browser tab where we can see our application running. You should now see traffic flowing to multiple backend services.\n"
+},
+{
+	"uri": "/cleanup/workspace/",
+	"title": "Cleanup the Workspace",
+	"tags": [],
+	"description": "",
+	"content": "Since we no longer need the Cloud9 instance to have Administrator access to our account, we can delete the workspace we created:\n Go to your Cloud9 Environment Select the environment named eksworkshop and pick delete  "
+},
+{
+	"uri": "/deploy/scalefrontend/",
+	"title": "Scale the Frontend",
+	"tags": [],
+	"description": "",
+	"content": "Let\u0026rsquo;s also scale our frontend service the same way:\nkubectl get deployments kubectl scale deployment ecsdemo-frontend --replicas=3 kubectl get deployments  Check the browser tab where we can see our application running. You should now see traffic flowing to multiple frontend services.\n"
+},
+{
+	"uri": "/conclusion/survey/",
+	"title": "Let us know what you think!",
+	"tags": [],
+	"description": "",
+	"content": " Please take our survey! (function(t,e,s,n){var o,a,c;t.SMCX=t.SMCX||[],e.getElementById(n)||(o=e.getElementsByTagName(s),a=o[o.length-1],c=e.createElement(s),c.type=\"text/javascript\",c.async=!0,c.id=n,c.src=[\"https:\"===location.protocol?\"https://\":\"http://\",\"widget.surveymonkey.com/collect/website/js/tRaiETqnLgj758hTBazgd_2BU860jlhPrsKW9DSM0aec7fijRMWQEdDb7y2zM_2FUrIx.js\"].join(\"\"),a.parentNode.insertBefore(c,a))})(window,document,\"script\",\"smcx-sdk\");Create your own user feedback survey    "
+},
+{
+	"uri": "/cleanup/",
+	"title": "Cleanup",
+	"tags": [],
+	"description": "",
+	"content": " Cleanup "
+},
+{
+	"uri": "/deploy/cleanup/",
+	"title": "Cleanup the applications",
+	"tags": [],
+	"description": "",
+	"content": "To delete the resources created by the applications, we should delete the application deployments:\nUndeploy the applications:\ncd ~/environment/ecsdemo-frontend kubectl delete -f kubernetes/service.yaml kubectl delete -f kubernetes/deployment.yaml cd ~/environment/ecsdemo-crystal kubectl delete -f kubernetes/service.yaml kubectl delete -f kubernetes/deployment.yaml cd ~/environment/ecsdemo-nodejs kubectl delete -f kubernetes/service.yaml kubectl delete -f kubernetes/deployment.yaml  "
+},
+{
+	"uri": "/conclusion/",
+	"title": "Conclusion",
+	"tags": [],
+	"description": "",
+	"content": " Conclusion "
+},
+{
+	"uri": "/categories/",
+	"title": "Categories",
+	"tags": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "/authors/",
+	"title": "Credits",
+	"tags": [],
+	"description": "",
+	"content": " Thanks to our wonderful contributors  for making Open Source a better place! .ghContributors{ display:flex; flex-flow: wrap; align-content: flex-start } .ghContributors  div{ width: 50% ; display: inline-flex; margin-bottom: 5px; } .ghContributors  div label{ padding-left: 4px ; } .ghContributors  div span{ font-size: x-small; padding-left: 4px ; }   @brentley 79 commits   @geremyCohen 30 commits   @oak2278 22 commits   @arun-gupta 12 commits   @dalbhanj 10 commits   @rnzsgh 9 commits   @jpeddicord 6 commits   @buzzsurfr 6 commits   @nikipat 4 commits   @gmarchand 3 commits   @mpdominguez 3 commits   @tabern 3 commits   @alexpulver 2 commits   @alexei-led 2 commits   @DocValerian 2 commits   @rasensio 2 commits   @jennylover 2 commits   @waynekhan 2 commits   @johnstanfield 2 commits   @jonjozwiak 2 commits   @rudpot 2 commits   @ocxo 1 commits   @andreivmaksimov 1 commits   @sharmaanshul21 1 commits   @bhean 1 commits   @ChanceLee0111 1 commits   @cannoc 1 commits   @ckamps 1 commits   @liljenstolpe 1 commits   @rebelthor 1 commits   @gibbster 1 commits   @deki 1 commits   @enghwa 1 commits   @nrdlngr 1 commits   @feanil 1 commits   @GElkayam 1 commits   @geordan-hatech 1 commits   @giusedroid 1 commits   @awsimaya 1 commits   @itaysk 1 commits   @jsunmapr 1 commits   @techsolx 1 commits   @jonDowdle 1 commits   @jmferrer 1 commits   @jupp0r 1 commits   @kimsaabyepedersen 1 commits   @kbiton 1 commits   @Lixxia 1 commits   @LiranBri 1 commits   @mreferre 1 commits   @mikesigs 1 commits   @nihooge 1 commits   @wolruf 1 commits   @runningman84 1 commits   @ranrotx 1 commits   @ryanwilsonperkin 1 commits   @shaiss 1 commits   @sajee 1 commits   @lavignes 1 commits   @onyno 1 commits   @obbaeiei 1 commits   @toricls 1 commits   @trevorrobertsjr 1 commits   @tsahiduek 1 commits   @Turochamp 1 commits   @vjsikha 1 commits   @oik741 1 commits   @algestam 1 commits   @auziel 1 commits   @barelnir 1 commits   @clavery-chef 1 commits   @gearora 1 commits   @jaybarnes 1 commits   @snowjunkie 1 commits   @thepoosh 1 commits   @garbagetown 1 commits   @omeraplak 1 commits   @TemuulenS 1 commits   @ptux 1 commits   "
+},
+{
+	"uri": "/example_cf_templates/",
+	"title": "Example of using CloudFormation Templates",
+	"tags": [],
+	"description": "",
+	"content": " Click below to add a CloudFormation Stack    Use these templates:       Template 1 example  Launch    Download     Template 2 example  Launch    Download     Template 3 example  Launch    Download      "
+},
+{
+	"uri": "/prerequisites/eu-west-1/",
+	"title": "Ireland",
+	"tags": [],
+	"description": "",
+	"content": "Create a Cloud9 Environment: https://eu-west-1.console.aws.amazon.com/cloud9/home?region=eu-west-1\n"
+},
+{
+	"uri": "/prerequisites/self_paced/eu-west-1/",
+	"title": "Ireland",
+	"tags": [],
+	"description": "",
+	"content": "Create a Cloud9 Environment: https://eu-west-1.console.aws.amazon.com/cloud9/home?region=eu-west-1\n"
+},
+{
+	"uri": "/more_resources/",
+	"title": "More Resources",
+	"tags": [],
+	"description": "",
+	"content": " Discover more AWS resources for building and running your application on AWS:\nMore Workshops  Amazon ECS Workshop - Learn how to use Stelligent Mu to deploy a microservice architecture that runs in AWS Fargate Amazon Lightsail Workshop - If you are getting started with the cloud and looking for a way to run an extremely low cost environment Lightsail is perfect. Learn how to deploy to Amazon Lightsail with this workshop.  Tools for AWS Fargate and Amazon ECS  Containers on AWS - Learn common best-practices for running containers on AWS fargate - Command line tool for interacting with AWS Fargate. With just a single command you can build, push, and launch your container in Fargate, orchestrated by ECS. Terraform - Use Terraform to deploy your docker containers in Fargate Wonqa is a tool for spinning up disposable QA environments in AWS Fargate, with SSL enabled by Let\u0026rsquo;s Encrypt. More details about Wonqa on the Wonder Engineering blog coldbrew - Fantastic tool that provisions ECS infrastructure, builds and deploys your container, and connects your services to an application load balancer automatically. Has a great developer experience for day to day use mu - Automates everything relating to ECS devops and CI/CD. This framework lets you write a simple metadata file and it constructs all the infrastructure you need so that you can deploy to ECS by simply pushing to your Git repo.  Courses  Microservices with Docker, Flask, and React - Learn how to build, test, and deploy microservices powered by Docker, Flask, React Amazon ECS!  "
+},
+{
+	"uri": "/prerequisites/self_paced/us-east-2/",
+	"title": "Ohio",
+	"tags": [],
+	"description": "",
+	"content": "Create a Cloud9 Environment: https://us-east-2.console.aws.amazon.com/cloud9/home?region=us-east-2\n"
+},
+{
+	"uri": "/prerequisites/us-east-2/",
+	"title": "Ohio",
+	"tags": [],
+	"description": "",
+	"content": "Create a Cloud9 Environment: https://us-east-2.console.aws.amazon.com/cloud9/home?region=us-east-2\n"
+},
+{
+	"uri": "/prerequisites/self_paced/us-west-2/",
+	"title": "Oregon",
+	"tags": [],
+	"description": "",
+	"content": "Create a Cloud9 Environment: https://us-west-2.console.aws.amazon.com/cloud9/home?region=us-west-2\n"
+},
+{
+	"uri": "/prerequisites/us-west-2/",
+	"title": "Oregon",
+	"tags": [],
+	"description": "",
+	"content": "Create a Cloud9 Environment: https://us-west-2.console.aws.amazon.com/cloud9/home?region=us-west-2\n"
+},
+{
+	"uri": "/prerequisites/ap-southeast-1/",
+	"title": "Singapore",
+	"tags": [],
+	"description": "",
+	"content": "Create a Cloud9 Environment: https://ap-southeast-1.console.aws.amazon.com/cloud9/home?region=ap-southeast-1\n"
+},
+{
+	"uri": "/prerequisites/self_paced/ap-southeast-1/",
+	"title": "Singapore",
+	"tags": [],
+	"description": "",
+	"content": "Create a Cloud9 Environment: https://ap-southeast-1.console.aws.amazon.com/cloud9/home?region=ap-southeast-1\n"
+},
+{
+	"uri": "/tags/",
+	"title": "Tags",
+	"tags": [],
+	"description": "",
+	"content": ""
+}]
