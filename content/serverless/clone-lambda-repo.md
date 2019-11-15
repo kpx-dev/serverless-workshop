@@ -14,19 +14,8 @@ weight: 14
 
 #### Clone repo and cd into it
 ```
-git clone https://github.com/kienpham2000/docker-example.git
+git clone https://github.com/kienpham2000/lambda-example.git
 
-cd docker-example
+cd lambda-example
 
-```
-
-Output will look like this
-```
-admin:~/environment $ git clone https://github.com/kienpham2000/docker-example.git
-Cloning into 'docker-example'...
-remote: Enumerating objects: 9, done.
-remote: Counting objects: 100% (9/9), done.
-remote: Compressing objects: 100% (7/7), done.
-remote: Total 9 (delta 1), reused 4 (delta 0), pack-reused 0
-Unpacking objects: 100% (9/9), done.
 ```

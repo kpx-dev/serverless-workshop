@@ -15,7 +15,7 @@
     <link rel="shortcut icon" href="../../images/favicon.ico" type="image/x-icon" />
 <link rel="icon" href="../../images/favicon.ico" type="image/x-icon" />
 
-    <title>Clone container repo :: Serverless Workshop</title>
+    <title>Package &amp; Deploy Lambda using SAM :: Serverless Workshop</title>
 
     
     <link href="../../css/nucleus.css?1573812815" rel="stylesheet">
@@ -47,7 +47,7 @@
     </style>
     
   </head>
-  <body class="" data-url="/container/clone-container-repo/">
+  <body class="" data-url="/serverless/sam/">
     <nav id="sidebar" class="">
 
   
@@ -88,7 +88,7 @@
 
 
 <li data-nav-id="/container/" title="Lab 1: Container" class="dd-item
-        parent
+        
         
         
         ">
@@ -113,7 +113,7 @@
 
 
 <li data-nav-id="/container/clone-container-repo/" title="Clone container repo"
-  class="dd-item active">
+  class="dd-item ">
   <a href="../../container/clone-container-repo/">
     Clone container repo
     
@@ -240,7 +240,7 @@
 
 
 <li data-nav-id="/serverless/" title="Lab 2: Serverless" class="dd-item
-        
+        parent
         
         
         ">
@@ -285,7 +285,7 @@
 
 
 <li data-nav-id="/serverless/sam/" title="Package &amp; Deploy Lambda using SAM"
-  class="dd-item ">
+  class="dd-item active">
   <a href="../../serverless/sam/">
     Package &amp; Deploy Lambda using SAM
     
@@ -341,7 +341,7 @@
                   
                   
                   <div id="top-github-link">
-                    <a class="github-link" title='Edit this page' href="https://github.com/kienpham2000/chatbot-workshop/edit/master/content/container/clone-container-repo.md" target="blank">
+                    <a class="github-link" title='Edit this page' href="https://github.com/kienpham2000/chatbot-workshop/edit/master/content/serverless/sam.md" target="blank">
                       <i class="fas fa-code-branch"></i>
                       <span id="top-github-link-text">Edit this page</span>
                     </a>
@@ -370,7 +370,7 @@
             
           
           
-            <a href='../../'>Serverless Workshop</a> > <a href='../../container/'>Lab 1: Container</a> > Clone container repo
+            <a href='../../'>Serverless Workshop</a> > <a href='../../serverless/'>Lab 2: Serverless</a> > Package & Deploy Lambda using SAM
           
          
           
@@ -390,7 +390,11 @@
 <ul>
 <li>
 <ul>
-<li><a href="#clone-repo-and-cd-into-it">Clone repo and cd into it</a></li>
+<li><a href="#create-the-s3-repo-to-store-sam-artifact">Create the S3 repo to store SAM artifact</a></li>
+<li><a href="#upgrade-sam-cli-to-latest-version">Upgrade SAM CLI to latest version</a></li>
+<li><a href="#package-the-template">Package the template</a></li>
+<li><a href="#deploy-lambda-using-sam">Deploy Lambda using SAM</a></li>
+<li><a href="#add-files-to-s3">Add files to S3</a></li>
 </ul></li>
 </ul></li>
 </ul></li>
@@ -407,7 +411,7 @@
         
         <div id="body-inner">
           
-            <h1>Clone container repo</h1>
+            <h1>Package &amp; Deploy Lambda using SAM</h1>
           
 
         
@@ -415,34 +419,36 @@
 
 
 
-<ol>
-<li><p>Login to your AWS Account, make sure you are in the <strong>North Virginia (us-east-1)</strong> region</p></li>
+<h4 id="create-the-s3-repo-to-store-sam-artifact">Create the S3 repo to store SAM artifact</h4>
 
-<li><p>Click on Services Drop down, type <strong>Cloud9</strong>.</p></li>
+<p>Since the S3 repo name must be unique globally, please postfix with your username</p>
 
-<li><p>There should be an existing environment created for you called <strong>lab</strong>. Click on <strong>Open IDE</strong>.</p></li>
-
-<li><p>Once launched, go to a Terminal tab:</p></li>
-</ol>
-
-<h4 id="clone-repo-and-cd-into-it">Clone repo and cd into it</h4>
-
-<pre><code>git clone https://github.com/kienpham2000/docker-example.git
-
-cd docker-example
-
+<pre><code>aws s3api create-bucket --bucket serverless-lab-[your-username]
 </code></pre>
 
-<p>Output will look like this</p>
+<h4 id="upgrade-sam-cli-to-latest-version">Upgrade SAM CLI to latest version</h4>
 
-<pre><code>admin:~/environment $ git clone https://github.com/kienpham2000/docker-example.git
-Cloning into 'docker-example'...
-remote: Enumerating objects: 9, done.
-remote: Counting objects: 100% (9/9), done.
-remote: Compressing objects: 100% (7/7), done.
-remote: Total 9 (delta 1), reused 4 (delta 0), pack-reused 0
-Unpacking objects: 100% (9/9), done.
+<pre><code>sudo pip install --upgrade aws-sam-cli
 </code></pre>
+
+<h4 id="package-the-template">Package the template</h4>
+
+<p>Don&rsquo;t forget to replace <code>serverless-lab-[your-username]</code> with your actual S3 bucket name.</p>
+
+<pre><code>sam package --s3-bucket serverless-lab-[your-username] --s3-prefix lab --output-template-file template_packaged.yaml
+</code></pre>
+
+<h4 id="deploy-lambda-using-sam">Deploy Lambda using SAM</h4>
+
+<p>This will take 1-2 minutes as SAM is creating CloudFormation stack. You will also see that there&rsquo;s a new S3 bucket created by SAM: <code>serverless-lab-lambda-mys3bucket-</code>.</p>
+
+<pre><code>sam deploy --template-file template_packaged.yaml --stack-name serverless-lab-lambda --capabilities CAPABILITY_IAM
+</code></pre>
+
+<h4 id="add-files-to-s3">Add files to S3</h4>
+
+<p>Now when you add any file to the above S3 bucket (<code>serverless-lab-lambda-mys3bucket-</code>) you will see that Lambda will get triggered.
+From Lambda, you can click on Monitoring / CloudWatch and view its latest logs.</p>
 
 
 <footer class=" footline" >
@@ -481,6 +487,8 @@ Unpacking objects: 100% (9/9), done.
             
                 
                     
+                        
+                        
                     
                 
                 
@@ -494,26 +502,6 @@ Unpacking objects: 100% (9/9), done.
             
             
                 
-                    
-                    
-                
-                
-
-                    
-                    
-                    
-
-                    
-            
-        
-                    
-                        
-            
-            
-                
-                    
-                        
-                        
                     
                 
                 
@@ -590,38 +578,6 @@ Unpacking objects: 100% (9/9), done.
             
         
                     
-            
-        
-                    
-                        
-            
-            
-                
-                    
-                
-                
-
-                    
-                    
-                    
-
-                    
-                        
-            
-            
-                
-                    
-                
-                
-
-                    
-                    
-                    
-
-                    
-            
-        
-                    
                         
             
             
@@ -641,6 +597,59 @@ Unpacking objects: 100% (9/9), done.
             
         
                     
+                        
+            
+            
+                
+                    
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+                        
+            
+            
+                
+                    
+                        
+                        
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+                        
+            
+            
+                
+                    
+                    
+                
+                
+
+                    
+                    
+                    
+
+                    
+            
+        
+                    
+            
+        
+                    
             
         
 
@@ -648,10 +657,10 @@ Unpacking objects: 100% (9/9), done.
 
 
         
-            <a class="nav nav-prev" href="../../container/" title="Lab 1: Container"> <i class="fas fa-chevron-left"></i></a>
+            <a class="nav nav-prev" href="../../serverless/clone-lambda-repo/" title="Clone Lambda repo"> <i class="fas fa-chevron-left"></i></a>
         
         
-            <a class="nav nav-next" href="../../container/docker-build-run/" title="Docker build &amp; run" style="margin-right: 0px;"><i class="fas fa-chevron-right"></i></a>
+            <a class="nav nav-next" href="../../serverless/clone-lambda-repo/" title="Clone Lambda repo" style="margin-right: 0px;"><i class="fas fa-chevron-right"></i></a>
         
     </div>
 

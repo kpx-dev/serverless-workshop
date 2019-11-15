@@ -23,11 +23,11 @@
   </url>
   
   <url>
-    <loc>/serverless/docker-build-run/</loc>
+    <loc>/serverless/</loc>
   </url>
   
   <url>
-    <loc>/serverless/</loc>
+    <loc>/serverless/sam/</loc>
   </url>
   
   <url>

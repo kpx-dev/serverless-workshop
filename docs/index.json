@@ -18,7 +18,7 @@
 	"title": "Clone Lambda repo",
 	"tags": [],
 	"description": "",
-	"content": "  Login to your AWS Account, make sure you are in the North Virginia (us-east-1) region\n Click on Services Drop down, type Cloud9.\n There should be an existing environment created for you called lab. Click on Open IDE.\n Once launched, go to a Terminal tab:\n  Clone repo and cd into it git clone https://github.com/kienpham2000/docker-example.git cd docker-example  Output will look like this\nadmin:~/environment $ git clone https://github.com/kienpham2000/docker-example.git Cloning into 'docker-example'... remote: Enumerating objects: 9, done. remote: Counting objects: 100% (9/9), done. remote: Compressing objects: 100% (7/7), done. remote: Total 9 (delta 1), reused 4 (delta 0), pack-reused 0 Unpacking objects: 100% (9/9), done.  "
+	"content": "  Login to your AWS Account, make sure you are in the North Virginia (us-east-1) region\n Click on Services Drop down, type Cloud9.\n There should be an existing environment created for you called lab. Click on Open IDE.\n Once launched, go to a Terminal tab:\n  Clone repo and cd into it git clone https://github.com/kienpham2000/lambda-example.git cd lambda-example  "
 },
 {
 	"uri": "/container/clone-container-repo/",
@@ -35,18 +35,18 @@
 	"content": " Build the Docker image docker build -t web .  Output\nadmin:~/environment/docker-example (master) $ docker build -t web . Sending build context to Docker daemon 65.54kB Step 1/2 : FROM nginx:alpine ---\u0026gt; b6753551581f Step 2/2 : COPY index.html /usr/share/nginx/html ---\u0026gt; Using cache ---\u0026gt; d44b90c272d6 Successfully built d44b90c272d6 Successfully tagged web:latest  Run the container docker run -p 80:80 --name web web  Verify the container is running Create a new Terminal tab\ndocker ps  Output\nadmin:~/environment $ docker ps CONTAINER ID IMAGE COMMAND CREATED STATUS PORTS NAMES eadc9b959908 web \u0026quot;nginx -g 'daemon of…\u0026quot; 33 seconds ago Up 32 seconds 0.0.0.0:80-\u0026gt;80/tcp web  "
 },
 {
-	"uri": "/serverless/docker-build-run/",
-	"title": "Docker build &amp; run",
-	"tags": [],
-	"description": "",
-	"content": " Build the Docker image docker build -t web .  Output\nadmin:~/environment/docker-example (master) $ docker build -t web . Sending build context to Docker daemon 65.54kB Step 1/2 : FROM nginx:alpine ---\u0026gt; b6753551581f Step 2/2 : COPY index.html /usr/share/nginx/html ---\u0026gt; Using cache ---\u0026gt; d44b90c272d6 Successfully built d44b90c272d6 Successfully tagged web:latest  Run the container docker run -p 80:80 --name web web  Verify the container is running Create a new Terminal tab\ndocker ps  Output\nadmin:~/environment $ docker ps CONTAINER ID IMAGE COMMAND CREATED STATUS PORTS NAMES eadc9b959908 web \u0026quot;nginx -g 'daemon of…\u0026quot; 33 seconds ago Up 32 seconds 0.0.0.0:80-\u0026gt;80/tcp web  "
-},
-{
 	"uri": "/serverless/",
 	"title": "Lab 2: Serverless",
 	"tags": [],
 	"description": "",
 	"content": " Lab 2 Overview In this lab, we\u0026rsquo;ll a simple Lambda function that watch for new files being uploaded to S3. We\u0026rsquo;ll deploy this Lambda using SAM.\n"
+},
+{
+	"uri": "/serverless/sam/",
+	"title": "Package &amp; Deploy Lambda using SAM",
+	"tags": [],
+	"description": "",
+	"content": " Create the S3 repo to store SAM artifact Since the S3 repo name must be unique globally, please postfix with your username\naws s3api create-bucket --bucket serverless-lab-[your-username]  Upgrade SAM CLI to latest version sudo pip install --upgrade aws-sam-cli  Package the template Don\u0026rsquo;t forget to replace serverless-lab-[your-username] with your actual S3 bucket name.\nsam package --s3-bucket serverless-lab-[your-username] --s3-prefix lab --output-template-file template_packaged.yaml  Deploy Lambda using SAM This will take 1-2 minutes as SAM is creating CloudFormation stack. You will also see that there\u0026rsquo;s a new S3 bucket created by SAM: serverless-lab-lambda-mys3bucket-.\nsam deploy --template-file template_packaged.yaml --stack-name serverless-lab-lambda --capabilities CAPABILITY_IAM  Add files to S3 Now when you add any file to the above S3 bucket (serverless-lab-lambda-mys3bucket-) you will see that Lambda will get triggered. From Lambda, you can click on Monitoring / CloudWatch and view its latest logs.\n"
 },
 {
 	"uri": "/container/view-page/",
