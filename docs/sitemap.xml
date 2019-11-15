@@ -7,35 +7,43 @@
   </url>
   
   <url>
-    <loc>/prerequisites/</loc>
+    <loc>/container/</loc>
   </url>
   
   <url>
-    <loc>/prerequisites/workspace/</loc>
+    <loc>/serverless/clone-lambda-repo/</loc>
   </url>
   
   <url>
-    <loc>/prerequisites/docker-build-run/</loc>
+    <loc>/container/clone-container-repo/</loc>
   </url>
   
   <url>
-    <loc>/prerequisites/view-page/</loc>
+    <loc>/container/docker-build-run/</loc>
   </url>
   
   <url>
-    <loc>/prerequisites/ecr/</loc>
+    <loc>/serverless/docker-build-run/</loc>
   </url>
   
   <url>
-    <loc>/prerequisites/ecs/</loc>
+    <loc>/serverless/</loc>
   </url>
   
   <url>
-    <loc>/prerequisites/clone/</loc>
+    <loc>/container/view-page/</loc>
   </url>
   
   <url>
-    <loc>/prerequisites/sshkey/</loc>
+    <loc>/container/ecr/</loc>
+  </url>
+  
+  <url>
+    <loc>/container/ecs/</loc>
+  </url>
+  
+  <url>
+    <loc>/container/view-ecs/</loc>
   </url>
   
   <url>
@@ -52,39 +60,7 @@
   </url>
   
   <url>
-    <loc>/prerequisites/eu-west-1/</loc>
-  </url>
-  
-  <url>
-    <loc>/prerequisites/self_paced/eu-west-1/</loc>
-  </url>
-  
-  <url>
     <loc>/more_resources/</loc>
-  </url>
-  
-  <url>
-    <loc>/prerequisites/self_paced/us-east-2/</loc>
-  </url>
-  
-  <url>
-    <loc>/prerequisites/us-east-2/</loc>
-  </url>
-  
-  <url>
-    <loc>/prerequisites/self_paced/us-west-2/</loc>
-  </url>
-  
-  <url>
-    <loc>/prerequisites/us-west-2/</loc>
-  </url>
-  
-  <url>
-    <loc>/prerequisites/ap-southeast-1/</loc>
-  </url>
-  
-  <url>
-    <loc>/prerequisites/self_paced/ap-southeast-1/</loc>
   </url>
   
   <url>

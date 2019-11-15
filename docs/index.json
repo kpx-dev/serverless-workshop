@@ -7,60 +7,74 @@
 	"content": "Serverless Workshop We\u0026rsquo;ll learn about AWS Serverless offering. Click on Lab 1 on the left to get started.\n"
 },
 {
-	"uri": "/prerequisites/",
+	"uri": "/container/",
 	"title": "Lab 1: Container",
 	"tags": [],
 	"description": "",
-	"content": " Getting Started Continue with Create a Workspace\n"
+	"content": " Lab 1 Overview In this lab, we\u0026rsquo;ll create a simple Docker container, build and run it locally. Then we\u0026rsquo;ll push it to ECR and run it using ECS Fargate.\n"
 },
 {
-	"uri": "/prerequisites/workspace/",
-	"title": "Clone repo from Cloud9",
+	"uri": "/serverless/clone-lambda-repo/",
+	"title": "Clone Lambda repo",
 	"tags": [],
 	"description": "",
 	"content": "  Login to your AWS Account, make sure you are in the North Virginia (us-east-1) region\n Click on Services Drop down, type Cloud9.\n There should be an existing environment created for you called lab. Click on Open IDE.\n Once launched, go to a Terminal tab:\n  Clone repo and cd into it git clone https://github.com/kienpham2000/docker-example.git cd docker-example  Output will look like this\nadmin:~/environment $ git clone https://github.com/kienpham2000/docker-example.git Cloning into 'docker-example'... remote: Enumerating objects: 9, done. remote: Counting objects: 100% (9/9), done. remote: Compressing objects: 100% (7/7), done. remote: Total 9 (delta 1), reused 4 (delta 0), pack-reused 0 Unpacking objects: 100% (9/9), done.  "
 },
 {
-	"uri": "/prerequisites/docker-build-run/",
+	"uri": "/container/clone-container-repo/",
+	"title": "Clone container repo",
+	"tags": [],
+	"description": "",
+	"content": "  Login to your AWS Account, make sure you are in the North Virginia (us-east-1) region\n Click on Services Drop down, type Cloud9.\n There should be an existing environment created for you called lab. Click on Open IDE.\n Once launched, go to a Terminal tab:\n  Clone repo and cd into it git clone https://github.com/kienpham2000/docker-example.git cd docker-example  Output will look like this\nadmin:~/environment $ git clone https://github.com/kienpham2000/docker-example.git Cloning into 'docker-example'... remote: Enumerating objects: 9, done. remote: Counting objects: 100% (9/9), done. remote: Compressing objects: 100% (7/7), done. remote: Total 9 (delta 1), reused 4 (delta 0), pack-reused 0 Unpacking objects: 100% (9/9), done.  "
+},
+{
+	"uri": "/container/docker-build-run/",
 	"title": "Docker build &amp; run",
 	"tags": [],
 	"description": "",
 	"content": " Build the Docker image docker build -t web .  Output\nadmin:~/environment/docker-example (master) $ docker build -t web . Sending build context to Docker daemon 65.54kB Step 1/2 : FROM nginx:alpine ---\u0026gt; b6753551581f Step 2/2 : COPY index.html /usr/share/nginx/html ---\u0026gt; Using cache ---\u0026gt; d44b90c272d6 Successfully built d44b90c272d6 Successfully tagged web:latest  Run the container docker run -p 80:80 --name web web  Verify the container is running Create a new Terminal tab\ndocker ps  Output\nadmin:~/environment $ docker ps CONTAINER ID IMAGE COMMAND CREATED STATUS PORTS NAMES eadc9b959908 web \u0026quot;nginx -g 'daemon of…\u0026quot; 33 seconds ago Up 32 seconds 0.0.0.0:80-\u0026gt;80/tcp web  "
 },
 {
-	"uri": "/prerequisites/view-page/",
+	"uri": "/serverless/docker-build-run/",
+	"title": "Docker build &amp; run",
+	"tags": [],
+	"description": "",
+	"content": " Build the Docker image docker build -t web .  Output\nadmin:~/environment/docker-example (master) $ docker build -t web . Sending build context to Docker daemon 65.54kB Step 1/2 : FROM nginx:alpine ---\u0026gt; b6753551581f Step 2/2 : COPY index.html /usr/share/nginx/html ---\u0026gt; Using cache ---\u0026gt; d44b90c272d6 Successfully built d44b90c272d6 Successfully tagged web:latest  Run the container docker run -p 80:80 --name web web  Verify the container is running Create a new Terminal tab\ndocker ps  Output\nadmin:~/environment $ docker ps CONTAINER ID IMAGE COMMAND CREATED STATUS PORTS NAMES eadc9b959908 web \u0026quot;nginx -g 'daemon of…\u0026quot; 33 seconds ago Up 32 seconds 0.0.0.0:80-\u0026gt;80/tcp web  "
+},
+{
+	"uri": "/serverless/",
+	"title": "Lab 2: Serverless",
+	"tags": [],
+	"description": "",
+	"content": " Lab 2 Overview In this lab, we\u0026rsquo;ll a simple Lambda function that watch for new files being uploaded to S3. We\u0026rsquo;ll deploy this Lambda using SAM.\n"
+},
+{
+	"uri": "/container/view-page/",
 	"title": "View the container content",
 	"tags": [],
 	"description": "",
 	"content": " Allow your laptop to access EC2 port 80  Go to EC2 / Instances Click on the one running instance Click on Security groups and Inbound / Edit. Allow port 80 to My IP and Save.  Go back to Cloud 9, get the EC2 Public IP curl 169.254.169.254/latest/meta-data/public-ipv4; echo  Open the IP in a new browser tab You should see a text: Hello RTS team!\nStop the container Try stopping the container and refresh the last page, it should not work anymore.\ndocker stop web  "
 },
 {
-	"uri": "/prerequisites/ecr/",
+	"uri": "/container/ecr/",
 	"title": "Create ECR Repo",
 	"tags": [],
 	"description": "",
 	"content": " Go to ECR service, Get Started. Type in web and click on Create repository.  Click on web / View push commands. Go ahead and copy and paste each command. You will run these commands at Cloud9 Terminal. Note: the first command make sure to include $() Output  Now if you close the push command and refresh the registry, you will see latest image tag pushed to the repo.   "
 },
 {
-	"uri": "/prerequisites/ecs/",
+	"uri": "/container/ecs/",
 	"title": "Create ECS Cluster",
 	"tags": [],
 	"description": "",
-	"content": " Go to ECS service Click on Get started button   "
+	"content": " Go to ECS service Click on Get started button  Click on Configure button at the custom section. For the Image, open new browser tab and go to ECR and it\u0026rsquo;s under URI, then append :latest at the end of the URI.  At Step 2, leave everything default and click Next  At Step 3, leave everything default and click Next  At Step 4, review to make sure everything looks good, click Create  After about 3 minutes, all 9 steps will be completed. Click on View Service button   "
 },
 {
-	"uri": "/prerequisites/clone/",
-	"title": "Clone the Service Repos",
+	"uri": "/container/view-ecs/",
+	"title": "View Fargate Container",
 	"tags": [],
 	"description": "",
-	"content": "cd ~/environment git clone https://github.com/brentley/ecsdemo-frontend.git git clone https://github.com/brentley/ecsdemo-nodejs.git git clone https://github.com/brentley/ecsdemo-crystal.git  "
-},
-{
-	"uri": "/prerequisites/sshkey/",
-	"title": "Create an SSH key",
-	"tags": [],
-	"description": "",
-	"content": " Starting from here, when you see command to be entered such as below, you will enter these commands into Cloud9 IDE. You can use the Copy to clipboard feature (right hand upper corner) to simply copy and paste into Cloud9. In order to paste, you can use Ctrl + V for Windows or Command + V for Mac.\n Please run this command to generate SSH Key in Cloud9. This key will be used on the worker node instances to allow ssh access if necessary.\nssh-keygen  Press enter 3 times to take the default choices\n Upload the public key to your EC2 region:\naws ec2 import-key-pair --key-name \u0026quot;eksworkshop-yourusername\u0026quot; --public-key-material file://~/.ssh/id_rsa.pub  "
+	"content": " Click on Tasks tab from ECS default cluster, you\u0026rsquo;ll see one container running on Fargate. If you go back to EC2 and check, there\u0026rsquo;s no new EC2 instance launched!  Click into the link under Task column Under Network, you\u0026rsquo;ll see the Public IP. Open this IP in a new browser tab, you will see the content of your container running on Fargate serverlessly!   "
 },
 {
 	"uri": "/categories/",
@@ -84,67 +98,11 @@
 	"content": " Click below to add a CloudFormation Stack    Use these templates:       Template 1 example  Launch    Download     Template 2 example  Launch    Download     Template 3 example  Launch    Download      "
 },
 {
-	"uri": "/prerequisites/eu-west-1/",
-	"title": "Ireland",
-	"tags": [],
-	"description": "",
-	"content": "Create a Cloud9 Environment: https://eu-west-1.console.aws.amazon.com/cloud9/home?region=eu-west-1\n"
-},
-{
-	"uri": "/prerequisites/self_paced/eu-west-1/",
-	"title": "Ireland",
-	"tags": [],
-	"description": "",
-	"content": "Create a Cloud9 Environment: https://eu-west-1.console.aws.amazon.com/cloud9/home?region=eu-west-1\n"
-},
-{
 	"uri": "/more_resources/",
 	"title": "More Resources",
 	"tags": [],
 	"description": "",
 	"content": " Discover more AWS resources for building and running your application on AWS:\nMore Workshops  Amazon ECS Workshop - Learn how to use Stelligent Mu to deploy a microservice architecture that runs in AWS Fargate Amazon Lightsail Workshop - If you are getting started with the cloud and looking for a way to run an extremely low cost environment Lightsail is perfect. Learn how to deploy to Amazon Lightsail with this workshop.  Tools for AWS Fargate and Amazon ECS  Containers on AWS - Learn common best-practices for running containers on AWS fargate - Command line tool for interacting with AWS Fargate. With just a single command you can build, push, and launch your container in Fargate, orchestrated by ECS. Terraform - Use Terraform to deploy your docker containers in Fargate Wonqa is a tool for spinning up disposable QA environments in AWS Fargate, with SSL enabled by Let\u0026rsquo;s Encrypt. More details about Wonqa on the Wonder Engineering blog coldbrew - Fantastic tool that provisions ECS infrastructure, builds and deploys your container, and connects your services to an application load balancer automatically. Has a great developer experience for day to day use mu - Automates everything relating to ECS devops and CI/CD. This framework lets you write a simple metadata file and it constructs all the infrastructure you need so that you can deploy to ECS by simply pushing to your Git repo.  Courses  Microservices with Docker, Flask, and React - Learn how to build, test, and deploy microservices powered by Docker, Flask, React Amazon ECS!  "
-},
-{
-	"uri": "/prerequisites/self_paced/us-east-2/",
-	"title": "Ohio",
-	"tags": [],
-	"description": "",
-	"content": "Create a Cloud9 Environment: https://us-east-2.console.aws.amazon.com/cloud9/home?region=us-east-2\n"
-},
-{
-	"uri": "/prerequisites/us-east-2/",
-	"title": "Ohio",
-	"tags": [],
-	"description": "",
-	"content": "Create a Cloud9 Environment: https://us-east-2.console.aws.amazon.com/cloud9/home?region=us-east-2\n"
-},
-{
-	"uri": "/prerequisites/self_paced/us-west-2/",
-	"title": "Oregon",
-	"tags": [],
-	"description": "",
-	"content": "Create a Cloud9 Environment: https://us-west-2.console.aws.amazon.com/cloud9/home?region=us-west-2\n"
-},
-{
-	"uri": "/prerequisites/us-west-2/",
-	"title": "Oregon",
-	"tags": [],
-	"description": "",
-	"content": "Create a Cloud9 Environment: https://us-west-2.console.aws.amazon.com/cloud9/home?region=us-west-2\n"
-},
-{
-	"uri": "/prerequisites/ap-southeast-1/",
-	"title": "Singapore",
-	"tags": [],
-	"description": "",
-	"content": "Create a Cloud9 Environment: https://ap-southeast-1.console.aws.amazon.com/cloud9/home?region=ap-southeast-1\n"
-},
-{
-	"uri": "/prerequisites/self_paced/ap-southeast-1/",
-	"title": "Singapore",
-	"tags": [],
-	"description": "",
-	"content": "Create a Cloud9 Environment: https://ap-southeast-1.console.aws.amazon.com/cloud9/home?region=ap-southeast-1\n"
 },
 {
 	"uri": "/tags/",

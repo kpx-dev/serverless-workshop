@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Lab 2: Serverless on Serverless Workshop</title>
+    <link>/serverless/</link>
+    <description>Recent content in Lab 2: Serverless on Serverless Workshop</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    
+	<atom:link href="/serverless/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Clone Lambda repo</title>
+      <link>/serverless/clone-lambda-repo/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/serverless/clone-lambda-repo/</guid>
+      <description>Login to your AWS Account, make sure you are in the North Virginia (us-east-1) region
+ Click on Services Drop down, type Cloud9.
+ There should be an existing environment created for you called lab. Click on Open IDE.
+ Once launched, go to a Terminal tab:
+  Clone repo and cd into it git clone https://github.com/kienpham2000/docker-example.git cd docker-example  Output will look like this
+admin:~/environment $ git clone https://github.</description>
+    </item>
+    
+    <item>
+      <title>Docker build &amp; run</title>
+      <link>/serverless/docker-build-run/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/serverless/docker-build-run/</guid>
+      <description>Build the Docker image docker build -t web .  Output
+admin:~/environment/docker-example (master) $ docker build -t web . Sending build context to Docker daemon 65.54kB Step 1/2 : FROM nginx:alpine ---&amp;gt; b6753551581f Step 2/2 : COPY index.html /usr/share/nginx/html ---&amp;gt; Using cache ---&amp;gt; d44b90c272d6 Successfully built d44b90c272d6 Successfully tagged web:latest  Run the container docker run -p 80:80 --name web web  Verify the container is running Create a new Terminal tab</description>
+    </item>
+    
+  </channel>
+</rss>
