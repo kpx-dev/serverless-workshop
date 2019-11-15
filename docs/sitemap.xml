@@ -4,35 +4,6 @@
   
   <url>
     <loc>/</loc>
-    <lastmod>2018-09-18T16:01:14-05:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/conclusion/conclusion/</loc>
-  </url>
-  
-  <url>
-    <loc>/deploy/applications/</loc>
-    <lastmod>2018-09-18T16:01:14-05:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/deploy/deploynodejs/</loc>
-    <lastmod>2018-09-18T17:39:30-05:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/eksctl/prerequisites/</loc>
-    <lastmod>2018-08-07T13:31:55-07:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/dashboard/dashboard/</loc>
-    <lastmod>2018-08-07T08:30:11-07:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/codepipeline/role/</loc>
   </url>
   
   <url>
@@ -40,67 +11,23 @@
   </url>
   
   <url>
-    <loc>/codepipeline/configmap/</loc>
-  </url>
-  
-  <url>
-    <loc>/codepipeline/forksample/</loc>
-  </url>
-  
-  <url>
-    <loc>/codepipeline/githubcredentials/</loc>
-  </url>
-  
-  <url>
-    <loc>/codepipeline/codepipeline/</loc>
-  </url>
-  
-  <url>
     <loc>/prerequisites/workspace/</loc>
   </url>
   
   <url>
-    <loc>/prerequisites/k8stools/</loc>
+    <loc>/prerequisites/docker-build-run/</loc>
   </url>
   
   <url>
-    <loc>/codepipeline/change/</loc>
+    <loc>/prerequisites/view-page/</loc>
   </url>
   
   <url>
-    <loc>/codepipeline/cleanup/</loc>
+    <loc>/prerequisites/ecr/</loc>
   </url>
   
   <url>
-    <loc>/prerequisites/iamrole/</loc>
-  </url>
-  
-  <url>
-    <loc>/prerequisites/ec2instance/</loc>
-  </url>
-  
-  <url>
-    <loc>/prerequisites/workspaceiam/</loc>
-  </url>
-  
-  <url>
-    <loc>/deploy/deploycrystal/</loc>
-    <lastmod>2018-09-18T17:40:03-05:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/cleanup/undeploy/</loc>
-    <lastmod>2018-08-07T13:37:53-07:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/eksctl/launcheks/</loc>
-    <lastmod>2018-08-07T13:34:24-07:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/eksctl/</loc>
-    <lastmod>2018-08-07T13:31:55-07:00</lastmod>
+    <loc>/prerequisites/ecs/</loc>
   </url>
   
   <url>
@@ -108,88 +35,7 @@
   </url>
   
   <url>
-    <loc>/deploy/servicetype/</loc>
-    <lastmod>2018-09-18T17:40:09-05:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/deploy/servicerole/</loc>
-    <lastmod>2018-09-18T17:40:09-05:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/deploy/deployfrontend/</loc>
-    <lastmod>2018-09-18T17:40:09-05:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/cleanup/eksctl/</loc>
-    <lastmod>2018-08-07T13:37:53-07:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/eksctl/test/</loc>
-    <lastmod>2018-08-07T13:36:57-07:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/dashboard/connect/</loc>
-    <lastmod>2018-08-07T08:30:11-07:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/dashboard/</loc>
-    <lastmod>2018-08-07T08:30:11-07:00</lastmod>
-  </url>
-  
-  <url>
     <loc>/prerequisites/sshkey/</loc>
-  </url>
-  
-  <url>
-    <loc>/deploy/</loc>
-    <lastmod>2018-09-18T16:01:14-05:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/deploy/viewservices/</loc>
-    <lastmod>2018-09-18T17:40:09-05:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/codepipeline/</loc>
-  </url>
-  
-  <url>
-    <loc>/deploy/scalebackend/</loc>
-    <lastmod>2018-09-18T17:40:09-05:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/cleanup/workspace/</loc>
-  </url>
-  
-  <url>
-    <loc>/deploy/scalefrontend/</loc>
-    <lastmod>2018-09-18T17:40:09-05:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/conclusion/survey/</loc>
-  </url>
-  
-  <url>
-    <loc>/cleanup/</loc>
-    <lastmod>2018-08-07T13:37:53-07:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/deploy/cleanup/</loc>
-    <lastmod>2018-08-07T13:37:53-07:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/conclusion/</loc>
   </url>
   
   <url>

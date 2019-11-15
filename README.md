@@ -1,4 +1,4 @@
-# Chatbot Workshop
+# Serverless Workshop
 
 ### Setup:
 

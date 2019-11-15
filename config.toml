@@ -1,7 +1,7 @@
 languageCode = "en-us"
 ignoreFiles = [ "\\.files/README.md$",  ]
 defaultContentLanguage = "en"
-title = "Amazon Chatbot Workshop"
+title = "Serverless Workshop"
 theme = "learn"
 uglyurls = false
 googleAnalytics = ""
@@ -17,13 +17,13 @@ editURL = "https://github.com/kienpham2000/chatbot-workshop/edit/master/content/
 themeVariant = "mine"
 showVisitedLinks = false
 author = "Kien Pham"
-description = "Amazon Chatbot Workshop"
+description = "Serverless Workshop"
 disableSearch = false
 disableAssetsBusting = false
 disableLanguageSwitchingButton = true
 disableShortcutsTitle=false
 disableInlineCopyToClipBoard = true
-ghrepo = "https://github.com/kienpham2000/chatbot-workshop/"
+ghrepo = "https://github.com/kienpham2000/serverless-workshop/"
 branch = "master"
 template_bucket = "chatbotworkshop.com"
 pygmentsUseClasses = true
@@ -40,26 +40,6 @@ pygmentsStyle = "tango"
     title = "Workshop using Mu"
     url = "/mu/"
     weight = -110
-
-[[menu.shortcuts]]
-name = "<i class='fas fa-bookmark'></i> More Resources"
-url = "/more_resources"
-weight = 10
-
-[[menu.shortcuts]]
-name = "<i class='fas fa-users'></i> Authors"
-url = "/authors"
-weight = 20
-
-[[menu.shortcuts]]
-name = "<i class='fab fa-github'></i> GitHub Project"
-url = "https://github.com/kienpham2000/chatbot-workshop"
-weight = 30
-
-[[menu.shortcuts]]
-name = "<i class='fas fa-envelope'></i> Have questions?"
-url = "mailto:reinvent-chatbot@amazon.com"
-weight = 40
 
 [outputs]
 home = [ "HTML", "JSON"]
