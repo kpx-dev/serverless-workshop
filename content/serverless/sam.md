@@ -12,7 +12,7 @@ aws s3api create-bucket --bucket serverless-lab-[your-username]
 ```
 
 #### Upgrade SAM CLI to latest version
-Run the command below and press **ENTER** to continue
+Run the command below and press **ENTER** to continue. Once done, please open **New Terminal**
 ```
 ./install-sam.sh
 ```
